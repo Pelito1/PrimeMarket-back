@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 @Service
 public class ProductService {
@@ -40,7 +41,7 @@ public class ProductService {
 
     // Método para obtener todos los productos
     public List<Product> findAll() {
-        String sql = "SELECT p.*, b.NAME AS BRAND_NAME FROM PRODUCT p LEFT JOIN BRAND b ON p.BRAND_ID = b.ID";
+        String sql = "SELECT p.*, b.NAME AS BRAND_NAME FROM PRODUCT p LEFT JOIN BRAND b ON p.BRAND_ID = b.ID where rownum <=20";
         return jdbcTemplate.query(sql, productRowMapper);
     }
 
@@ -90,4 +91,46 @@ public class ProductService {
         String sqlUpdate = "UPDATE PRODUCT SET STOCK = STOCK - ? WHERE ID = ?";
         jdbcTemplate.update(sqlUpdate, qty, productId);
     }
+
+    public List<Product> getProductsByPriceRange(int minPrice, int maxPrice, int page, int size) {
+        String sql = "SELECT * FROM ( " +
+                "SELECT p.*, b.NAME AS BRAND_NAME, " +
+                "ROW_NUMBER() OVER (ORDER BY p.ID) AS row_num " +
+                "FROM PRODUCT p " +
+                "LEFT JOIN BRAND b ON p.BRAND_ID = b.ID " +
+                "WHERE p.PRICE BETWEEN ? AND ? " +
+                ") WHERE row_num BETWEEN ? AND ?";
+
+        int startRow = (page - 1) * size + 1;
+        int endRow = page * size;
+
+        return jdbcTemplate.query(sql, new Object[]{minPrice, maxPrice, startRow, endRow}, productRowMapper);
+    }
+
+    public int countProductsByPriceRange(int minPrice, int maxPrice) {
+        String sql = "SELECT COUNT(*) FROM PRODUCT WHERE PRICE BETWEEN ? AND ?";
+        return jdbcTemplate.queryForObject(sql, new Object[]{minPrice, maxPrice}, Integer.class);
+    }
+
+
+    public List<Product> getPaginatedProducts(int page, int size) {
+        String sql = "SELECT * FROM ( " +
+                "SELECT p.*, b.NAME AS BRAND_NAME, " +
+                "ROW_NUMBER() OVER (ORDER BY p.ID) AS row_num " +
+                "FROM PRODUCT p " +
+                "LEFT JOIN BRAND b ON p.BRAND_ID = b.ID " +
+                ") WHERE row_num BETWEEN ? AND ?";
+
+        int startRow = (page - 1) * size + 1;  // Primer producto de la página
+        int endRow = page * size;              // Último producto de la página
+
+        return jdbcTemplate.query(sql, new Object[]{startRow, endRow}, productRowMapper);
+    }
+
+    public int countAllProducts() {
+        String sql = "SELECT COUNT(*) FROM PRODUCT";
+        return jdbcTemplate.queryForObject(sql, Integer.class);
+    }
+
+
 }

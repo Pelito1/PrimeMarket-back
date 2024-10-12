@@ -7,7 +7,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/products")
@@ -56,6 +58,43 @@ public class ProductController {
     public ResponseEntity<List<Product>> searchProducts(@PathVariable("keyword") String keyword) {
         List<Product> products = productService.searchByKeyword(keyword);
         return new ResponseEntity<>(products, HttpStatus.OK);
+    }
+
+    @GetMapping("/filter")
+    public ResponseEntity<Map<String, Object>> filterProducts(
+            @RequestParam int minPrice,
+            @RequestParam int maxPrice,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "50") int size
+    ) {
+        List<Product> products = productService.getProductsByPriceRange(minPrice, maxPrice, page, size);
+        int totalProducts = productService.countProductsByPriceRange(minPrice, maxPrice);
+        boolean hasMore = page * size < totalProducts;
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("products", products);
+        response.put("totalProducts", totalProducts);
+        response.put("hasMore", hasMore);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+
+    @GetMapping("/paginated")
+    public ResponseEntity<Map<String, Object>> getPaginatedProducts(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "52") int size
+    ) {
+        int totalProducts = productService.countAllProducts(); // Llamada al método que cuenta los productos
+        List<Product> products = (List<Product>) getPaginatedProducts(page, size);
+        boolean hasMore = products.size() == size;
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("products", products);
+        response.put("totalProducts", totalProducts);
+        response.put("hasMore", hasMore);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 

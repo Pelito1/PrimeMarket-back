@@ -57,4 +57,11 @@ public class CategoryService {
         String sql = "SELECT * FROM CATEGORY WHERE PARENT_CATEGORY_ID = ?";
         return jdbcTemplate.query(sql, new Object[]{parentCategoryId}, categoryRowMapper);
     }
+
+    // Método para obtener todas las categorías padre
+    public List<Category> findParentCategories() {
+        String sql = "SELECT * FROM CATEGORY WHERE PARENT_CATEGORY_ID IS NULL";
+        return jdbcTemplate.query(sql, categoryRowMapper);
+    }
+
 }

@@ -90,4 +90,11 @@ public class CategoryController {
         return new ResponseEntity<>(categories, HttpStatus.OK);
     }
 
+    // Obtener categorías padre (sin categoría padre asignada)
+    @GetMapping("/parent")
+    public ResponseEntity<List<Category>> getParentCategories() {
+        List<Category> parentCategories = categoryService.findParentCategories();
+        return new ResponseEntity<>(parentCategories, HttpStatus.OK);
+    }
+
 }
