@@ -51,4 +51,12 @@ public class ProductController {
         productService.delete(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
+    // **Nuevo método para buscar productos por palabra clave**
+    @GetMapping("/search/{keyword}")
+    public ResponseEntity<List<Product>> searchProducts(@PathVariable("keyword") String keyword) {
+        List<Product> products = productService.searchByKeyword(keyword);
+        return new ResponseEntity<>(products, HttpStatus.OK);
+    }
+
+
 }

@@ -50,6 +50,14 @@ public class ProductService {
         return jdbcTemplate.queryForObject(sql, new Object[]{id}, productRowMapper);
     }
 
+    // **Nuevo método para buscar productos por palabra clave**
+    public List<Product> searchByKeyword(String keyword) {
+        String sql = "SELECT p.*, b.NAME AS BRAND_NAME FROM PRODUCT p LEFT JOIN BRAND b ON p.BRAND_ID = b.ID " +
+                "WHERE p.NAME LIKE ? OR p.DESCRIPTION LIKE ?";
+        String likePattern = "%" + keyword + "%";
+        return jdbcTemplate.query(sql, new Object[]{likePattern, likePattern}, productRowMapper);
+    }
+
     // Método para guardar un nuevo producto
     public void save(Product product) {
         String sql = "INSERT INTO PRODUCT (ID, NAME, PRICE, DESCRIPTION, STOCK, IMAGE, BRAND_ID) " +

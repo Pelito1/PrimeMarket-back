@@ -83,4 +83,11 @@ public class CategoryController {
         categoryProductService.removeProductFromCategory(productId, categoryId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
+    // Obtener las categorías y subcategorías asociadas a un producto
+    @GetMapping("/products/{productId}/categories")
+    public ResponseEntity<List<Category>> getCategoriesByProduct(@PathVariable("productId") Integer productId) {
+        List<Category> categories = categoryProductService.getCategoriesByProduct(productId);
+        return new ResponseEntity<>(categories, HttpStatus.OK);
+    }
+
 }
