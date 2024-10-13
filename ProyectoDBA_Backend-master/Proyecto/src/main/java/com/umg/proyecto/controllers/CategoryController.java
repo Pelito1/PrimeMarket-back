@@ -50,11 +50,11 @@ public class CategoryController {
     }
 
     // Eliminar una categoría por ID
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCategory(@PathVariable("id") Integer id) {
-        categoryService.delete(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-    }
+    //@DeleteMapping("/{id}")
+   // public ResponseEntity<Void> deleteCategory(@PathVariable("id") Integer id) {
+    //    categoryService.delete(id);
+     //   return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    //}
 
     // Obtener subcategorías por ID de categoría padre
     @GetMapping("/parent/{parentCategoryId}")
@@ -95,6 +95,16 @@ public class CategoryController {
     public ResponseEntity<List<Category>> getParentCategories() {
         List<Category> parentCategories = categoryService.findParentCategories();
         return new ResponseEntity<>(parentCategories, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteCategory(@PathVariable("id") Integer id) {
+        try {
+            categoryService.delete(id);
+            return new ResponseEntity<>("Categoría eliminada correctamente.", HttpStatus.NO_CONTENT);
+        } catch (RuntimeException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
 
 }
