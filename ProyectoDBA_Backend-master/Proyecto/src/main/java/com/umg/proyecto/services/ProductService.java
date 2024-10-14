@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -16,6 +17,9 @@ public class ProductService {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    private CategoryProductService categoryProductService;
 
     // Mapeador de filas para convertir las filas de la base de datos en objetos Product con Brand
     private final RowMapper<Product> productRowMapper = new RowMapper<Product>() {
@@ -132,5 +136,21 @@ public class ProductService {
         return jdbcTemplate.queryForObject(sql, Integer.class);
     }
 
+    @Transactional
+    public void updateProductWithCategory(Product product, Integer categoryId) {
+        // Actualizar producto en la tabla PRODUCT
+        String updateProductSql = "UPDATE PRODUCT SET NAME = ?, PRICE = ?, DESCRIPTION = ?, STOCK = ?, IMAGE = ?, BRAND_ID = ? WHERE ID = ?";
+        jdbcTemplate.update(updateProductSql,
+                product.getName(), product.getPrice(), product.getDescription(),
+                product.getStock(), product.getImage(),
+                product.getBrand().getId(), product.getId()
+        );
+
+        // Eliminar todas las relaciones del producto en CATEGORY_PRODUCT
+        categoryProductService.removeAllCategoriesFromProduct(product.getId());
+
+        // Insertar la nueva relación en CATEGORY_PRODUCT
+        categoryProductService.addProductToCategory(product.getId(), categoryId);
+    }
 
 }

@@ -29,6 +29,12 @@ public class CategoryProductService {
         jdbcTemplate.update(sql, categoryId, productId);
     }
 
+    // Método para eliminar todas las relaciones de un producto en CATEGORY_PRODUCT
+    public void removeAllCategoriesFromProduct(Integer productId) {
+        String sql = "DELETE FROM CATEGORY_PRODUCT WHERE PRODUCT_ID = ?";
+        jdbcTemplate.update(sql, productId);
+    }
+
     // Método para obtener los objetos Product por categoría
     public List<Product> getProductsByCategory(Integer categoryId) {
         String sql = "SELECT p.* FROM PRODUCT p INNER JOIN CATEGORY_PRODUCT cp ON p.ID = cp.PRODUCT_ID WHERE cp.CATEGORY_ID = ?";

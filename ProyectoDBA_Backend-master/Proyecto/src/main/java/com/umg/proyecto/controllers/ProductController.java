@@ -97,5 +97,18 @@ public class ProductController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @PutMapping("/{id}/category/{categoryId}")
+    public ResponseEntity<String> updateProductWithCategory(
+            @PathVariable("id") Integer productId,
+            @PathVariable("categoryId") Integer categoryId,
+            @RequestBody Product product) {
 
+        try {
+            product.setId(productId);
+            productService.updateProductWithCategory(product, categoryId);
+            return new ResponseEntity<>("Product and category updated successfully", HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Error updating product and category: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }
