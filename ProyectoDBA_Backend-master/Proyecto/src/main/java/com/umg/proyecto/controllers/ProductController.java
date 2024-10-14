@@ -48,10 +48,10 @@ public class ProductController {
     }
 
     // Eliminar un producto por ID
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteProduct(@PathVariable("id") Integer id) {
-        productService.delete(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+   @DeleteMapping("/{id}")
+   public ResponseEntity<Void> deleteProduct(@PathVariable("id") Integer id) {
+      productService.delete(id);
+      return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
     // **Nuevo método para buscar productos por palabra clave**
     @GetMapping("/search/{keyword}")
@@ -111,4 +111,16 @@ public class ProductController {
             return new ResponseEntity<>("Error updating product and category: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @DeleteMapping("/{id}/delete")
+    public ResponseEntity<String> deleteProductWithCategories(@PathVariable("id") Integer productId) {
+        try {
+            productService.deleteProductWithCategories(productId);
+            return new ResponseEntity<>("Product and its categories deleted successfully", HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Error deleting product and categories: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
 }

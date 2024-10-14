@@ -153,4 +153,13 @@ public class ProductService {
         categoryProductService.addProductToCategory(product.getId(), categoryId);
     }
 
+    @Transactional
+    public void deleteProductWithCategories(Integer productId) {
+        // Eliminar todas las relaciones del producto en CATEGORY_PRODUCT
+        categoryProductService.removeAllCategoriesFromProduct(productId);
+
+        // Eliminar el producto de la tabla PRODUCT
+        String deleteProductSql = "DELETE FROM PRODUCT WHERE ID = ?";
+        jdbcTemplate.update(deleteProductSql, productId);
+    }
 }
