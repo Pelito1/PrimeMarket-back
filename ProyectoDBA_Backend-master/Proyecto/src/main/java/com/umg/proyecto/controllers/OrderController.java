@@ -1,5 +1,5 @@
 package com.umg.proyecto.controllers;
-
+import org.springframework.web.bind.annotation.CrossOrigin;
 import com.umg.proyecto.models.Order;
 import com.umg.proyecto.models.OrderDetail;
 import com.umg.proyecto.models.OrderRequest;
@@ -21,7 +21,7 @@ public class OrderController {
 
     @Autowired
     private OrderDetailService orderDetailService;
-
+    @CrossOrigin(origins = "http://localhost:3000")
     // Obtener todas las órdenes
     @GetMapping
     public ResponseEntity<List<Order>> getAllOrders() {
@@ -58,12 +58,12 @@ public class OrderController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    // Eliminar una orden por ID
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteOrder(@PathVariable("id") Integer id) {
-        orderService.delete(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-    }
+//    // Eliminar una orden por ID
+//    @DeleteMapping("/{id}")
+//    public ResponseEntity<Void> deleteOrder(@PathVariable("id") Integer id) {
+//        orderService.delete(id);
+//        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+//    }
 
     // Obtener todos los detalles de una orden
     @GetMapping("/{orderId}/details")
@@ -105,4 +105,29 @@ public class OrderController {
             return new ResponseEntity<>("Error processing order: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @DeleteMapping("/{orderId}")
+    public ResponseEntity<String> deleteOrderAndDetails(@PathVariable("orderId") Integer orderId) {
+        try {
+            orderService.deleteOrderAndDetails(orderId);
+            return new ResponseEntity<>("Order and its details deleted successfully", HttpStatus.NO_CONTENT);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Error deleting order: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+    @PutMapping("/order-status/{orderId}")
+    public ResponseEntity<String> updateOrderStatus(
+            @PathVariable("orderId") Integer orderId,
+            @RequestBody String purchaseStatus) {
+        try {
+            orderService.updateOrderStatus(orderId, purchaseStatus);
+            return new ResponseEntity<>("Order status updated successfully", HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Error updating order status: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
 }

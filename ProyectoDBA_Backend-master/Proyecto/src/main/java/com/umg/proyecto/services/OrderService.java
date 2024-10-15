@@ -173,5 +173,16 @@ public class OrderService {
         jdbcTemplate.update(sqlUpdate, qty, productId);
     }
 
+    @Transactional
+    public void deleteOrderAndDetails(Integer orderId) {
+        // Eliminar los detalles de la orden
+        String deleteOrderDetailsSql = "DELETE FROM ORDER_DETAIL WHERE ORDER_ID = ?";
+        jdbcTemplate.update(deleteOrderDetailsSql, orderId);
+
+        // Eliminar la orden si se eliminaron los detalles correctamente
+        String deleteOrderSql = "DELETE FROM \"ORDER\" WHERE ID = ?";
+        jdbcTemplate.update(deleteOrderSql, orderId);
+    }
+
 
 }
