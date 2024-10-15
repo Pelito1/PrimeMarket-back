@@ -19,4 +19,5 @@ public class Season {
     private Date endDate;
     private String description;
     private Character status;
+    private String image;
 }
