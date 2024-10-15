@@ -2,6 +2,7 @@ package com.umg.proyecto.controllers;
 
 import com.umg.proyecto.models.Order;
 import com.umg.proyecto.models.OrderDetail;
+import com.umg.proyecto.models.OrderRequest;
 import com.umg.proyecto.services.OrderDetailService;
 import com.umg.proyecto.services.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -93,5 +94,15 @@ public class OrderController {
     public ResponseEntity<Void> deleteOrderDetail(@PathVariable("orderId") Integer orderId, @PathVariable("productId") Integer productId) {
         orderDetailService.delete(orderId, productId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @PostMapping("/checkout")
+    public ResponseEntity<String> checkout(@RequestBody OrderRequest orderRequest) {
+        try {
+            orderService.processOrder(orderRequest);
+            return new ResponseEntity<>("Order processed successfully", HttpStatus.CREATED);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Error processing order: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }
